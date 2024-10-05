@@ -1,9 +1,0 @@
-{
-  "compilerOptions": {
-    "target": "ES6",
-    "module": "commonjs",
-    "checkJs": true,  // JavaScript 파일에도 타입 체크를 적용
-    "allowJs": true   // JavaScript 파일을 허용
-  },
-  "exclude": ["node_modules"]
-}

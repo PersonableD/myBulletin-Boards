@@ -1,8 +1,11 @@
 # backend 폴더 안의 node_modules 폴더 제외
 backend/node_modules/
 
-# 루트 폴더의 .env 파일 제외
+# backend 폴더 안의 .env 파일 제외
 backend/.env
+
+# frontend 폴더 안의 node_modules 폴더 제외
+frontend/node_modules/
 
 # 로그 파일 및 기타 불필요한 파일들 제외
 npm-debug.log*

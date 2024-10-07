@@ -1,7 +1,36 @@
 import express from "express";
+import bcrypt from "bcryptjs"; //해싱작업을 위함
 import User from "../models/User.js";
-//라우터 생성
+import jwt from "jsonwebtoken"; //JWT는 사용자 인증을 위해 토큰을 발급
 const router = express.Router();
+
+//login 라우트
+router.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ msg: "Invalid credentials" }); //유효하지않은 자격
+    }
+    //로그인창에 입력한 패스워드와 email 정보로 DB안에서 찾은 패스워드가 일치하는 지 비교
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ msg: "Invalid credentials" });
+    }
+    //JWT 생성 sign(페이로드,서명비밀키,유효기간)
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
+    res.json({
+      token,
+      user: { id: user._id, username: user.username, email: user.email },
+    });
+  } catch (error) {
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
 //post 요청을 처리하는 라우터
 router.post("/register", async (req, res) => {
   const { username, email, password } = req.body;

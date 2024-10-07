@@ -1,6 +1,7 @@
 import express from "express"; //Node.js에서 웹 서버를 만들 수 있도록 도와주는 프레임워크
 import connectDB from "./config/db.js"; // 다른 파일에서 connectDB 함수를 가져오는 것
 import authRoutes from "./routes/auth.js";
+import postRoutes from "./routes/posts.js";
 
 const app = express();
 //DB연결
@@ -9,6 +10,7 @@ connectDB();
 app.use(express.json());
 //라우트 연결
 app.use("/api/auth", authRoutes);
+app.use("/api/posts", postRoutes);
 
 app.get("/", (req, res) => {
   res.send("API is running...");

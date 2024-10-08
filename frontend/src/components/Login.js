@@ -30,7 +30,10 @@ const Login = () => {
   };
 
   return (
-    <div className="relative w-1/3 h-3/4 bg-gray-900 rounded-lg shadow-md p-8">
+    <div
+      style={{ width: "500px", height: "550px" }}
+      className="relative bg-gray-900 rounded-lg shadow-md p-8"
+    >
       <h1 className="absolute bottom-0 right-0 p-4 text-gray-700 text-4xl text-green-400">
         정글네컷
       </h1>

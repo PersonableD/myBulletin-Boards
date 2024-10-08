@@ -178,15 +178,16 @@ function Capture() {
             height: "640px",
             objectFit: "cover",
           }}
+          className="rounded-md"
         />
 
         {/* 촬영 버튼을 웹캠 아래에 배치 */}
         <button
           onClick={startCapture}
           disabled={isCapturing}
-          style={{ marginTop: "10px" }}
+          className="flex w-100 justify-center mb-4 rounded-md bg-green-400 px-3 py-1.5 text-lg font-semibold leading-6 text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600"
         >
-          인생네컷 촬영 시작
+          촬영 시작
         </button>
 
         {/* 카운트다운 텍스트 */}
@@ -222,54 +223,66 @@ function Capture() {
           />
         )}
       </div>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          gap: "10px", // 왼쪽과 오른쪽 열 사이의 간격
-        }}
-      >
-        {/* 왼쪽 열 */}
+      <div>
+        <p>촬영 시작 버튼을 누르면 연속해서 4장의 사진이 찍힙니다.</p>
         <div
           style={{
             display: "flex",
-            flexDirection: "column",
-            gap: "10px", // 이미지들 사이의 세로 간격 설정
+            flexDirection: "row",
+            gap: "10px", // 왼쪽과 오른쪽 열 사이의 간격
           }}
         >
-          {images
-            .filter((_, index) => index % 2 === 0) // 인덱스가 짝수인 이미지를 필터링 (0, 2, 4...)
-            .map((image, index) => (
-              <img
-                key={`left-${index}`}
-                src={image}
-                alt={`인생네컷 왼쪽 ${index + 1}`}
-                style={{ width: "240px", height: "320px", objectFit: "cover" }}
-              />
-            ))}
-        </div>
+          {/* 왼쪽 열 */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "10px", // 이미지들 사이의 세로 간격 설정
+            }}
+          >
+            {images
+              .filter((_, index) => index % 2 === 0) // 인덱스가 짝수인 이미지를 필터링 (0, 2, 4...)
+              .map((image, index) => (
+                <img
+                  key={`left-${index}`}
+                  src={image}
+                  alt={`인생네컷 왼쪽 ${index + 1}`}
+                  style={{
+                    width: "240px",
+                    height: "320px",
+                    objectFit: "cover",
+                  }}
+                  className="rounded-md"
+                />
+              ))}
+          </div>
 
-        {/* 오른쪽 열 */}
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "10px", // 이미지들 사이의 세로 간격 설정
-          }}
-        >
-          {images
-            .filter((_, index) => index % 2 !== 0) // 인덱스가 홀수인 이미지를 필터링 (1, 3, 5...)
-            .map((image, index) => (
-              <img
-                key={`right-${index}`}
-                src={image}
-                alt={`인생네컷 오른쪽 ${index + 1}`}
-                style={{ width: "240px", height: "320px", objectFit: "cover" }}
-              />
-            ))}
+          {/* 오른쪽 열 */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "10px", // 이미지들 사이의 세로 간격 설정
+            }}
+          >
+            {images
+              .filter((_, index) => index % 2 !== 0) // 인덱스가 홀수인 이미지를 필터링 (1, 3, 5...)
+              .map((image, index) => (
+                <img
+                  key={`right-${index}`}
+                  src={image}
+                  alt={`인생네컷 오른쪽 ${index + 1}`}
+                  style={{
+                    width: "240px",
+                    height: "320px",
+                    objectFit: "cover",
+                  }}
+                  className="rounded-md"
+                />
+              ))}
+          </div>
         </div>
       </div>
-
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -295,7 +308,11 @@ function Capture() {
             required
           />
         </div>
-        <button type="submit" disabled={images.length < 4}>
+        <button
+          type="submit"
+          disabled={images.length < 4}
+          className="bg-white border-2 border-black text-black py-2 px-4 rounded transition duration-300 hover:bg-green-500 hover:text-white"
+        >
           작성
         </button>
       </form>

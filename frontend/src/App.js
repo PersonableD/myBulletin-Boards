@@ -36,7 +36,14 @@ const App = () => {
           <Route
             path="/register"
             element={
-              isAuthenticated ? <Navigate to="/capture" /> : <Register />
+              isAuthenticated ? (
+                <Navigate to="/capture" />
+              ) : (
+                <>
+                  <FallingSymbols />
+                  <Register />
+                </>
+              )
             }
           />
           {/* 인생네컷 촬영 페이지 (로그인 후 접근 가능) */}

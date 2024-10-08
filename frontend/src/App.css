@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+    font-family: 'SBAggroB';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2108@1.1/SBAggroB.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+body {
+    background-color: rgb(36, 36, 36); /* 원하는 배경색으로 설정 */
+    margin: 0; /* 기본 여백을 제거하여 깔끔한 레이아웃을 만듦 */
+    font-family: 'SBAggroB', Arial, sans-serif;
+  }

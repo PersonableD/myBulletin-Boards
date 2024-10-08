@@ -10,17 +10,27 @@ import CreatePost from "./components/CreatePost";
 import Login from "./components/Login";
 import Capture from "./components/Capture";
 import Register from "./components/Register";
-
+import FallingSymbols from "./components/FallingSymbols";
+import "./App.css";
 const App = () => {
   const isAuthenticated = !!localStorage.getItem("token"); // JWT 토큰을 통해 인증 확인
   return (
-    <Router>
-      <div>
+    <div className="w-screen flex h-screen justify-center items-center">
+      <Router>
         <Routes>
           {/* 로그인 페이지 */}
           <Route
             path="/login"
-            element={isAuthenticated ? <Navigate to="/capture" /> : <Login />}
+            element={
+              isAuthenticated ? (
+                <Navigate to="/capture" />
+              ) : (
+                <>
+                  <FallingSymbols />
+                  <Login />
+                </>
+              )
+            }
           />
           {/* 회원가입 페이지 */}
           <Route
@@ -41,8 +51,8 @@ const App = () => {
             element={isAuthenticated ? <PostList /> : <Navigate to="/login" />}
           />
         </Routes>
-      </div>
-    </Router>
+      </Router>
+    </div>
   );
 };
 

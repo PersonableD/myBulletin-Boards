@@ -43,7 +43,7 @@ const PostList = () => {
               <img
                 src={post.imageUrl}
                 alt={post.title}
-                style={{ width: "300px", height: "200px", objectFit: "cover" }}
+                style={{ width: "30%", height: "30%" }}
               />
             )}
           </li>

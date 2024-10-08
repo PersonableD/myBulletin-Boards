@@ -1,23 +1,46 @@
 import React, { useRef, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom"; // useNavigate import
+import { useNavigate } from "react-router-dom";
 import Webcam from "react-webcam";
 import api from "../api";
 
 function Capture() {
   const webcamRef = useRef(null);
-  const [title, setTitle] = useState(""); // 제목 상태
-  const [content, setContent] = useState(""); // 내용 상태
-  const [images, setImages] = useState([]); // 4장의 사진 상태
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [images, setImages] = useState([]);
   const [isCapturing, setIsCapturing] = useState(false);
-  const navigate = useNavigate(); // useNavigate 훅 사용
+  const [countdown, setCountdown] = useState(null);
+  const [flash, setFlash] = useState(false);
+  const navigate = useNavigate();
+
   useEffect(() => {
     if (isCapturing && images.length < 4) {
-      const timer = setTimeout(() => {
-        captureImage();
-      }, 5000); // 10초 간격으로 사진 촬영
-      return () => clearTimeout(timer);
+      startCountdown();
     }
   }, [isCapturing, images]);
+
+  const startCountdown = () => {
+    let count = 3;
+    setCountdown(count);
+    const countdownInterval = setInterval(() => {
+      count--;
+      if (count === 0) {
+        clearInterval(countdownInterval);
+        setCountdown(null);
+        triggerFlash();
+      } else {
+        setCountdown(count);
+      }
+    }, 1000);
+  };
+
+  const triggerFlash = () => {
+    setFlash(true);
+    setTimeout(() => {
+      captureImage();
+      setFlash(false);
+    }, 100);
+  };
 
   const captureImage = () => {
     const imageSrc = webcamRef.current.getScreenshot();
@@ -27,43 +50,60 @@ function Capture() {
   };
 
   const startCapture = () => {
-    setImages([]); //기존 이미지 초기화
+    setImages([]);
     setIsCapturing(true);
   };
 
-  // 설정: 2x2 프레임, 총 4개의 사진
   const createCollage = () => {
     return new Promise((resolve, reject) => {
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
-      const frameWidth = 640;
-      const frameHeight = 480;
+      const frameWidth = 600;
+      const frameHeight = 730;
 
-      // 설정: 2x2 프레임, 총 4개의 사진
-      canvas.width = frameWidth * 2;
-      canvas.height = frameHeight * 2;
+      canvas.width = 1200;
+      canvas.height = 1800;
 
-      let loadedImages = 0;
-      images.forEach((image, index) => {
-        const img = new Image();
-        img.src = image;
-        img.onload = () => {
-          const x = (index % 2) * frameWidth;
-          const y = Math.floor(index / 2) * frameHeight;
-          ctx.drawImage(img, x, y, frameWidth, frameHeight);
-          loadedImages++;
-          if (loadedImages === images.length) {
-            canvas.toBlob(async (blob) => {
-              try {
-                const imageUrl = await uploadImage(blob);
-                resolve(imageUrl);
-              } catch (error) {
-                reject(error);
-              }
-            }, "image/jpeg");
-          }
-        };
-      });
+      const frameImg = new Image();
+      frameImg.crossOrigin = "anonymous";
+      frameImg.src =
+        "https://seul-bucket.s3.ap-northeast-2.amazonaws.com/frames/jungle_frame_01.png.PNG";
+
+      frameImg.onload = () => {
+        let loadedImages = 0;
+
+        images.forEach((image, index) => {
+          const img = new Image();
+          img.src = image;
+          img.onload = () => {
+            const x = (index % 2) * frameWidth;
+            const y = Math.floor(index / 2) * frameHeight;
+            ctx.drawImage(img, x, y, frameWidth, frameHeight);
+            loadedImages++;
+
+            if (loadedImages === images.length) {
+              ctx.drawImage(frameImg, 0, 0, canvas.width, canvas.height);
+
+              canvas.toBlob(async (blob) => {
+                try {
+                  const imageUrl = await uploadImage(blob);
+                  resolve(imageUrl);
+                } catch (error) {
+                  reject(error);
+                }
+              }, "image/jpeg");
+            }
+          };
+        });
+      };
+
+      frameImg.onerror = (error) => {
+        console.error(
+          "프레임 이미지를 불러오는 중 오류가 발생했습니다.",
+          error
+        );
+        reject(error);
+      };
     });
   };
 
@@ -71,12 +111,11 @@ function Capture() {
     const formData = new FormData();
     formData.append("image", imageBlob, "collage.jpg");
     try {
-      // 로컬 스토리지에서 JWT 토큰을 가져와서 헤더에 추가
       const token = localStorage.getItem("token");
       const response = await api.post("/uploads", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
-          "x-auth-token": token, // JWT 토큰을 요청 헤더에 추가
+          "x-auth-token": token,
         },
       });
       return response.data.imageUrl;
@@ -90,86 +129,153 @@ function Capture() {
   };
 
   const createPost = async () => {
-    //handleSubmit: 폼 제출 시 호출되는 함수로, API 요청을 보내서 게시물을 생성.
-    // const handleSubmit = async (e) => {
-    //   // 기본 폼 제출 동작 방지
-    //   // 폼 제출 시 페이지가 새로고침되는 것을 막음
-    //   e.preventDefault();
     try {
-      const token = localStorage.getItem("token"); // JWT 토큰을 로컬스토리지에서 가져옴
-      console.log("Token:", token);
-
-      // 인생네컷 콜라주 생성 후 S3에 업로드
+      const token = localStorage.getItem("token");
       const collageUrl = await createCollage();
-      console.log("Collage URL:", collageUrl);
-
-      console.log("Title:", title);
-      console.log("Content:", content);
 
       await api.post(
         "/posts/create",
         { title, content, imageUrl: collageUrl },
-        { headers: { "x-auth-token": token } } //인증 토큰을 헤더에 포함
+        { headers: { "x-auth-token": token } }
       );
       alert("게시물이 성공적으로 작성되었습니다.");
-      setTitle(""); //폼 초기화
-      setContent(""); //폼 초기화
-      setImages([]); // 이미지 초기화
+      setTitle("");
+      setContent("");
+      setImages([]);
       setIsCapturing(false);
 
-      navigate("/"); // 게시물 목록 페이지로 이동
+      navigate("/");
     } catch (error) {
       console.error("Error creating post:", error);
       alert("게시물 작성 중 오류가 발생했습니다.");
     }
   };
+
   return (
-    <div>
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        flexDirection: "row",
+        gap: "20px",
+        marginTop: "20px",
+      }}
+    >
       <div
         style={{
+          position: "relative",
           display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
           flexDirection: "column",
+          alignItems: "center",
         }}
       >
         <Webcam
           audio={false}
           ref={webcamRef}
           screenshotFormat="image/jpeg"
-          width={640}
-          height={480}
+          style={{
+            width: "480px",
+            height: "640px",
+            objectFit: "cover",
+          }}
         />
+
+        {/* 촬영 버튼을 웹캠 아래에 배치 */}
         <button
           onClick={startCapture}
           disabled={isCapturing}
-          style={{ margin: "10px" }}
+          style={{ marginTop: "10px" }}
         >
           인생네컷 촬영 시작
         </button>
+
+        {/* 카운트다운 텍스트 */}
+        {countdown && (
+          <div
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              fontSize: "4rem",
+              color: "white",
+              fontWeight: "bold",
+            }}
+          >
+            {countdown}
+          </div>
+        )}
+
+        {/* 플래시 효과 */}
+        {flash && (
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+              backgroundColor: "white",
+              opacity: 0.8,
+              zIndex: 1,
+            }}
+          />
+        )}
+      </div>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          gap: "10px", // 왼쪽과 오른쪽 열 사이의 간격
+        }}
+      >
+        {/* 왼쪽 열 */}
         <div
           style={{
             display: "flex",
-            flexWrap: "wrap",
-            width: "640px",
-            marginTop: "20px",
+            flexDirection: "column",
+            gap: "10px", // 이미지들 사이의 세로 간격 설정
           }}
         >
-          {images.map((image, index) => (
-            <img
-              key={index}
-              src={image}
-              alt={`인생네컷 ${index + 1}`}
-              style={{ width: "50%", height: "240px", objectFit: "cover" }}
-            />
-          ))}
+          {images
+            .filter((_, index) => index % 2 === 0) // 인덱스가 짝수인 이미지를 필터링 (0, 2, 4...)
+            .map((image, index) => (
+              <img
+                key={`left-${index}`}
+                src={image}
+                alt={`인생네컷 왼쪽 ${index + 1}`}
+                style={{ width: "240px", height: "320px", objectFit: "cover" }}
+              />
+            ))}
+        </div>
+
+        {/* 오른쪽 열 */}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "10px", // 이미지들 사이의 세로 간격 설정
+          }}
+        >
+          {images
+            .filter((_, index) => index % 2 !== 0) // 인덱스가 홀수인 이미지를 필터링 (1, 3, 5...)
+            .map((image, index) => (
+              <img
+                key={`right-${index}`}
+                src={image}
+                alt={`인생네컷 오른쪽 ${index + 1}`}
+                style={{ width: "240px", height: "320px", objectFit: "cover" }}
+              />
+            ))}
         </div>
       </div>
+
       <form
         onSubmit={(e) => {
           e.preventDefault();
           createPost();
         }}
+        style={{ marginLeft: "20px" }}
       >
         <h2>게시물 작성</h2>
         <div>
@@ -177,7 +283,7 @@ function Capture() {
           <input
             type="text"
             value={title}
-            onChange={(e) => setTitle(e.target.value)} // 입력값을 상태로 저장
+            onChange={(e) => setTitle(e.target.value)}
             required
           />
         </div>
@@ -185,7 +291,7 @@ function Capture() {
           <label>내용</label>
           <textarea
             value={content}
-            onChange={(e) => setContent(e.target.value)} // 입력값을 상태로 저장
+            onChange={(e) => setContent(e.target.value)}
             required
           />
         </div>

@@ -3,7 +3,9 @@ import connectDB from "./config/db.js"; // 다른 파일에서 connectDB 함수�
 import authRoutes from "./routes/auth.js";
 import postRoutes from "./routes/posts.js";
 import commentRoutes from "./routes/comments.js";
+import uploadRoutes from "./routes/upload.js";
 import cors from "cors";
+
 const app = express();
 //DB연결
 connectDB();
@@ -17,6 +19,7 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/comments", commentRoutes);
+app.use("/api/uploads", uploadRoutes);
 
 app.get("/", (req, res) => {
   res.send("API is running...");

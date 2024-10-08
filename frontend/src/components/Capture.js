@@ -70,12 +70,20 @@ function Capture() {
     const formData = new FormData();
     formData.append("image", imageBlob, "collage.jpg");
     try {
-      const response = await api.post("/posts/create", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+      // 로컬 스토리지에서 JWT 토큰을 가져와서 헤더에 추가
+      const token = localStorage.getItem("token");
+      const response = await api.post("/uploads", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          "x-auth-token": token, // JWT 토큰을 요청 헤더에 추가
+        },
       });
       return response.data.imageUrl;
     } catch (error) {
-      console.error("업로드 실패:", error);
+      console.error(
+        "업로드 실패:",
+        error.response ? error.response.data : error
+      );
       alert("이미지 업로드 중 오류가 발생했습니다.");
     }
   };
@@ -92,6 +100,10 @@ function Capture() {
 
       // 인생네컷 콜라주 생성 후 S3에 업로드
       const collageUrl = await createCollage();
+      console.log("Collage URL:", collageUrl);
+
+      console.log("Title:", title);
+      console.log("Content:", content);
 
       await api.post(
         "/posts/create",

@@ -16,11 +16,7 @@ const App = () => {
     <Router>
       <div>
         <Routes>
-          <Route
-            path="/"
-            element={isAuthenticated ? <Navigate to="/capture" /> : <Login />}
-          />
-          <Route path="/login" element={<Login />} />
+          <Route path="/" element={<Login />} />
           <Route
             path="/capture"
             element={isAuthenticated ? <Capture /> : <Navigate to="/login" />}

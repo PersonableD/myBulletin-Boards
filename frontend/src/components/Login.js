@@ -19,35 +19,50 @@ const Login = () => {
       //로그인 성공 후 다른작업 수행(다른페이지로 넘어감)
       alert("로그인 성공!");
       navigate("/capture");
+      window.location.reload(); // 페이지 리로드를 통해 상태 초기화
     } catch (error) {
       console.error("로그인 실패:", error);
       alert("로그인에 실패했습니다.");
     }
   };
+  const handleNavigateToRegister = () => {
+    navigate("/register"); // 회원가입 페이지로 이동
+  };
 
   return (
-    <form onSubmit={handleLogin}>
-      <h2>로그인</h2>
+    <div>
+      <form onSubmit={handleLogin}>
+        <h2>로그인</h2>
+        <div>
+          <label>이메일</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </div>
+        <div>
+          <label>비밀번호</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
+        <button type="submit">로그인</button>
+      </form>
       <div>
-        <label>이메일</label>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
+        <p>계정이 없으신가요?</p>
+        <button
+          onClick={handleNavigateToRegister}
+          style={{ marginTop: "10px" }}
+        >
+          회원가입 하기
+        </button>
       </div>
-      <div>
-        <label>비밀번호</label>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-      </div>
-      <button type="submit">로그인</button>
-    </form>
+    </div>
   );
 };
 

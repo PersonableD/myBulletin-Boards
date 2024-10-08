@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"; // useNavigate import
 import Webcam from "react-webcam";
 import api from "../api";
 
@@ -8,7 +9,7 @@ function Capture() {
   const [content, setContent] = useState(""); // 내용 상태
   const [images, setImages] = useState([]); // 4장의 사진 상태
   const [isCapturing, setIsCapturing] = useState(false);
-
+  const navigate = useNavigate(); // useNavigate 훅 사용
   useEffect(() => {
     if (isCapturing && images.length < 4) {
       const timer = setTimeout(() => {
@@ -115,6 +116,8 @@ function Capture() {
       setContent(""); //폼 초기화
       setImages([]); // 이미지 초기화
       setIsCapturing(false);
+
+      navigate("/"); // 게시물 목록 페이지로 이동
     } catch (error) {
       console.error("Error creating post:", error);
       alert("게시물 작성 중 오류가 발생했습니다.");

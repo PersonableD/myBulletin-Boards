@@ -12,6 +12,10 @@ function Navbar() {
       window.location.reload(); // 페이지 리로드를 통해 상태 초기화
     }
   };
+
+  const handleRetake = () => {
+    navigate("/capture");
+  };
   // 정글네컷 버튼 클릭 시 페이지 리로드
   const handleReload = (e) => {
     e.preventDefault(); // 기본 링크 동작 방지
@@ -28,6 +32,14 @@ function Navbar() {
             >
               정글네컷
             </a>
+            <div class="flex flex-1 justify-center">
+              <button
+                class="text-xl font-semibold text-white focus:outline-none focus:opacity-80 cursor-pointer bg-green-400 rounded-lg px-3 py-3"
+                onClick={handleRetake}
+              >
+                다시 찍기
+              </button>
+            </div>
             <a
               className="flex-none text-xl font-semibold text-white focus:outline-none focus:opacity-80 ml-auto cursor-pointer"
               onClick={handleLogout}

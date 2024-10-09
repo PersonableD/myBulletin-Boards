@@ -25,6 +25,7 @@ body {
   height: 100%;
   transition: transform 0.6s;
   transform-style: preserve-3d; /* 자식 요소들을 3D로 보이게 설정 */
+  font-family: 'SBAggroB';
 }
 
 .flip-card:hover .flip-card-inner {
@@ -39,7 +40,7 @@ body {
   backface-visibility: hidden; /* 뒤쪽 면이 보이지 않도록 설정 */
   border-radius: 8px; /* 모서리를 둥글게 설정 */
   box-shadow: 0 6px 7px rgba(0, 0, 0, 0.3); /* 그림자 효과 추가 */
-  font-family: 'SBAggroB';
+
 }
 
 .flip-card-front {
@@ -48,8 +49,8 @@ body {
 }
 
 .flip-card-front-inner{
-    font-family: ' sans-serif';
-    font-weight:500;
+    font-family: 'SBAggroB';
+    font-weight: normal;
 }
 .flip-card-back {
   transform: rotateY(180deg); /* 뒷면을 180도 회전하여 뒤집히는 상태로 설정 */

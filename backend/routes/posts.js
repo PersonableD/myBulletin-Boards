@@ -1,6 +1,7 @@
 import express from "express";
 import auth from "../middleware/auth.js";
 import Post from "../models/Post.js";
+import Comment from "../models/Comment.js";
 import s3 from "../config/s3.js";
 import { Buffer } from "buffer"; //Node.js 내장 객체
 import multer from "multer";
@@ -70,6 +71,21 @@ router.delete("/delete/:id", auth, async (req, res) => {
     if (post.author.toString() !== req.user.id) {
       return res.status(401).json({ msg: "User not authorized" });
     }
+    // AWS S3에서 이미지 삭제
+    if (post.imageUrl) {
+      const params = {
+        Bucket: process.env.S3_BUCKET_NAME,
+        Key: post.imageUrl.split("/").pop(), // 이미지 파일 이름 추출
+      };
+      try {
+        await s3.deleteObject(params).promise();
+      } catch (error) {
+        console.error("S3 image delete error:", error);
+      }
+    }
+    // 관련 댓글 삭제
+    await Comment.deleteMany({ post: req.params.id });
+
     //여기 remove()로 했다가 안되서 deleteOne()으로 바꾸니까 됨
     await post.deleteOne();
     res.json({ msg: "Post removed" });

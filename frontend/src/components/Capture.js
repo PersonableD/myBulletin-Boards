@@ -19,6 +19,9 @@ function Capture() {
     }
   }, [isCapturing, images]);
 
+  const handleJump = () => {
+    navigate("/");
+  };
   const startCountdown = () => {
     let count = 5;
     setCountdown(count);
@@ -338,6 +341,13 @@ function Capture() {
               className="bg-white border-2 border-black text-black py-2 px-4 rounded transition duration-300 hover:bg-green-500 hover:text-white"
             >
               작성
+            </button>
+            <button
+              onClick={handleJump}
+              type="submit"
+              className="text-gray-900 py-2 px-4 rounded bottom -2 transition duration-300  hover:text-black"
+            >
+              건너뛰기
             </button>
           </div>
         </form>

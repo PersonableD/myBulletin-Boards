@@ -9,7 +9,7 @@ const router = express.Router();
 router.get("/", async (req, res) => {
   try {
     //최신순 정렬으로 게시물 불러오기
-    const posts = await Post.find().sort({ date: -1 });
+    const posts = await Post.find().sort({ likes: -1 });
     res.json(posts);
   } catch (error) {
     res.status(500).json({ msg: "Server error" });

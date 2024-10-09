@@ -182,6 +182,7 @@ function Capture() {
             width: "480px",
             height: "640px",
             objectFit: "cover",
+            transform: "scaleX(-1)",
           }}
           className="relative rounded-md top-5"
         />

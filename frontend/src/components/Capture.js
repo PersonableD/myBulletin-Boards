@@ -82,7 +82,18 @@ function Capture() {
           img.onload = () => {
             const x = (index % 2) * frameWidth;
             const y = Math.floor(index / 2) * frameHeight;
-            ctx.drawImage(img, x, y, frameWidth, frameHeight);
+
+            // 반전 효과를 위해 canvas에 스케일 적용
+            ctx.save(); // 현재 상태 저장
+
+            ctx.translate(x + frameWidth, y);
+            ctx.scale(-1, 1);
+
+            ctx.drawImage(img, 0, 0, frameWidth, frameHeight);
+
+            ctx.restore(); // 원래 상태로 복구
+
+            // ctx.drawImage(img, x, y, frameWidth, frameHeight);
             loadedImages++;
 
             if (loadedImages === images.length) {
@@ -259,6 +270,7 @@ function Capture() {
                     width: "220px",
                     height: "280px",
                     objectFit: "cover",
+                    transform: "scaleX(-1)",
                   }}
                   className="rounded-md m-2"
                 />
@@ -284,6 +296,7 @@ function Capture() {
                     width: "220px",
                     height: "280px",
                     objectFit: "cover",
+                    transform: "scaleX(-1)",
                   }}
                   className="rounded-md m-2"
                 />
@@ -291,20 +304,20 @@ function Capture() {
           </div>
         </div>
       </div>
-      <div className="w-1/3  bg-gray-600 flex justify-center p-10">
+      <div className="w-1/3 bg-gray-600 flex justify-center p-10">
         <form
           onSubmit={(e) => {
             e.preventDefault();
             createPost();
           }}
         >
-          <p className="text-4xl text-white">3. 남기고 싶은 말</p>
+          <p className="text-4xl text-white mb-8">3. 남기고 싶은 말</p>
           <div>
             <label>제목</label>
             <input
               type="text"
               value={title}
-              class="block w-full mb-2 rounded-md border-0 py-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              className="block w-full mb-2 rounded-md border-0 py-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               onChange={(e) => setTitle(e.target.value)}
               required
             />
@@ -313,18 +326,20 @@ function Capture() {
             <label>내용</label>
             <textarea
               value={content}
-              class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 h-40"
               onChange={(e) => setContent(e.target.value)}
               required
             />
           </div>
-          <button
-            type="submit"
-            disabled={images.length < 4}
-            className="bg-white border-2 border-black text-black py-2 px-4 rounded transition duration-300 hover:bg-green-500 hover:text-white"
-          >
-            작성
-          </button>
+          <div className="flex justify-end mt-4">
+            <button
+              type="submit"
+              disabled={images.length < 4}
+              className="bg-white border-2 border-black text-black py-2 px-4 rounded transition duration-300 hover:bg-green-500 hover:text-white"
+            >
+              작성
+            </button>
+          </div>
         </form>
       </div>
     </div>

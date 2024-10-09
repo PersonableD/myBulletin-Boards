@@ -9,7 +9,7 @@
     font-style: normal;
 }
 body {
-    background-color: rgb(255, 255, 255); /* 원하는 배경색으로 설정 */
+    background-color: rgb(228, 228, 228); /* 원하는 배경색으로 설정 */
     margin: 0; /* 기본 여백을 제거하여 깔끔한 레이아웃을 만듦 */
     font-family: 'SBAggroB', Arial, sans-serif;
   }
@@ -39,6 +39,7 @@ body {
   backface-visibility: hidden; /* 뒤쪽 면이 보이지 않도록 설정 */
   border-radius: 8px; /* 모서리를 둥글게 설정 */
   box-shadow: 0 6px 7px rgba(0, 0, 0, 0.3); /* 그림자 효과 추가 */
+  font-family: 'SBAggroB';
 }
 
 .flip-card-front {

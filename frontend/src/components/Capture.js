@@ -14,13 +14,13 @@ function Capture() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (isCapturing && images.length < 4) {
+    if (isCapturing && images.length < 4 && webcamRef.current) {
       startCountdown();
     }
   }, [isCapturing, images]);
 
   const startCountdown = () => {
-    let count = 3;
+    let count = 5;
     setCountdown(count);
     const countdownInterval = setInterval(() => {
       count--;
@@ -43,9 +43,13 @@ function Capture() {
   };
 
   const captureImage = () => {
-    const imageSrc = webcamRef.current.getScreenshot();
-    if (imageSrc) {
-      setImages((prevImages) => [...prevImages, imageSrc]);
+    if (webcamRef && webcamRef.current) {
+      const imageSrc = webcamRef.current.getScreenshot();
+      if (imageSrc) {
+        setImages((prevImages) => [...prevImages, imageSrc]);
+      }
+    } else {
+      console.error("Webcam reference is not available or not initialized");
     }
   };
 
@@ -157,9 +161,8 @@ function Capture() {
         display: "flex",
         justifyContent: "center",
         flexDirection: "row",
-        gap: "20px",
-        marginTop: "20px",
       }}
+      className="w-full h-screen"
     >
       <div
         style={{
@@ -168,7 +171,9 @@ function Capture() {
           flexDirection: "column",
           alignItems: "center",
         }}
+        className="w-1/3 bg-gray-800 p-10"
       >
+        <p className="text-4xl text-white">1. 정글에서의 추억 남기기</p>
         <Webcam
           audio={false}
           ref={webcamRef}
@@ -178,14 +183,14 @@ function Capture() {
             height: "640px",
             objectFit: "cover",
           }}
-          className="rounded-md"
+          className="relative rounded-md top-5"
         />
 
         {/* 촬영 버튼을 웹캠 아래에 배치 */}
         <button
           onClick={startCapture}
           disabled={isCapturing}
-          className="flex w-100 justify-center mb-4 rounded-md bg-green-400 px-3 py-1.5 text-lg font-semibold leading-6 text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600"
+          className="absolute bottom-10 flex w-100 justify-center rounded-lg bg-green-400 px-6 py-6 text-lg font-semibold leading-6 text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600"
         >
           촬영 시작
         </button>
@@ -199,9 +204,9 @@ function Capture() {
               left: "50%",
               transform: "translate(-50%, -50%)",
               fontSize: "4rem",
-              color: "white",
               fontWeight: "bold",
             }}
+            className="text-green-400"
           >
             {countdown}
           </div>
@@ -220,16 +225,18 @@ function Capture() {
               opacity: 0.8,
               zIndex: 1,
             }}
+            className="relative rounded-md top-5"
           />
         )}
       </div>
-      <div>
-        <p>촬영 시작 버튼을 누르면 연속해서 4장의 사진이 찍힙니다.</p>
+      <div className="w-1/3  bg-gray-700 p-10">
+        <p className="text-4xl text-white flex justify-center">
+          2. 잘 찍혔는 지 확인!
+        </p>
         <div
           style={{
             display: "flex",
             flexDirection: "row",
-            gap: "10px", // 왼쪽과 오른쪽 열 사이의 간격
           }}
         >
           {/* 왼쪽 열 */}
@@ -237,8 +244,8 @@ function Capture() {
             style={{
               display: "flex",
               flexDirection: "column",
-              gap: "10px", // 이미지들 사이의 세로 간격 설정
             }}
+            className="m-2"
           >
             {images
               .filter((_, index) => index % 2 === 0) // 인덱스가 짝수인 이미지를 필터링 (0, 2, 4...)
@@ -248,11 +255,11 @@ function Capture() {
                   src={image}
                   alt={`인생네컷 왼쪽 ${index + 1}`}
                   style={{
-                    width: "240px",
-                    height: "320px",
+                    width: "220px",
+                    height: "280px",
                     objectFit: "cover",
                   }}
-                  className="rounded-md"
+                  className="rounded-md m-2"
                 />
               ))}
           </div>
@@ -260,10 +267,10 @@ function Capture() {
           {/* 오른쪽 열 */}
           <div
             style={{
-              display: "flex",
+              display: "flex ",
               flexDirection: "column",
-              gap: "10px", // 이미지들 사이의 세로 간격 설정
             }}
+            className="m-2"
           >
             {images
               .filter((_, index) => index % 2 !== 0) // 인덱스가 홀수인 이미지를 필터링 (1, 3, 5...)
@@ -273,49 +280,52 @@ function Capture() {
                   src={image}
                   alt={`인생네컷 오른쪽 ${index + 1}`}
                   style={{
-                    width: "240px",
-                    height: "320px",
+                    width: "220px",
+                    height: "280px",
                     objectFit: "cover",
                   }}
-                  className="rounded-md"
+                  className="rounded-md m-2"
                 />
               ))}
           </div>
         </div>
       </div>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          createPost();
-        }}
-        style={{ marginLeft: "20px" }}
-      >
-        <h2>게시물 작성</h2>
-        <div>
-          <label>제목</label>
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label>내용</label>
-          <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            required
-          />
-        </div>
-        <button
-          type="submit"
-          disabled={images.length < 4}
-          className="bg-white border-2 border-black text-black py-2 px-4 rounded transition duration-300 hover:bg-green-500 hover:text-white"
+      <div className="w-1/3  bg-gray-600 flex justify-center p-10">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            createPost();
+          }}
         >
-          작성
-        </button>
-      </form>
+          <p className="text-4xl text-white">3. 남기고 싶은 말</p>
+          <div>
+            <label>제목</label>
+            <input
+              type="text"
+              value={title}
+              class="block w-full mb-2 rounded-md border-0 py-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              onChange={(e) => setTitle(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label>내용</label>
+            <textarea
+              value={content}
+              class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              onChange={(e) => setContent(e.target.value)}
+              required
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={images.length < 4}
+            className="bg-white border-2 border-black text-black py-2 px-4 rounded transition duration-300 hover:bg-green-500 hover:text-white"
+          >
+            작성
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

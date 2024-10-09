@@ -6,6 +6,7 @@ const postSchema = new mongoose.Schema({
   author: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   date: { type: Date, default: Date.now },
   imageUrl: { type: String },
+  likes: { type: Number, default: 0 },
 });
 
 const Post = mongoose.model("Post", postSchema);

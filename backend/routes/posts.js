@@ -77,4 +77,24 @@ router.delete("/delete/:id", auth, async (req, res) => {
   }
 });
 
+//게시물 좋아요 수 증가 라우트
+router.put("/like/:id", auth, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+
+    if (!post) {
+      return res.status(404).json({ msg: "Post not found" });
+    }
+
+    //좋아요 수 증가
+    post.likes += 1;
+    await post.save();
+
+    res.json({ likes: post.likes });
+  } catch (error) {
+    console.error("Error updating likes:", error);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
 export default router;

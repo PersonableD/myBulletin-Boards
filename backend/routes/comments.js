@@ -5,6 +5,15 @@ import Post from "../models/Post.js";
 
 const router = express.Router();
 
+router.get("/:postId", async (req, res) => {
+  try {
+    const comments = await Comment.find({ post: req.params.postId });
+    res.status(200).json(comments); // 댓글 목록 배열 반환
+  } catch (error) {
+    res.status(500).json({ msg: "댓글 불러오기 오류" });
+  }
+});
+
 router.post("/:postId", auth, async (req, res) => {
   const { text } = req.body;
   try {

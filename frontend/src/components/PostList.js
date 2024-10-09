@@ -74,9 +74,6 @@ const PostList = () => {
   //게시물 삭제
   const handleDelete = async (postId) => {
     try {
-      if (userId !== postId) {
-        alert("작성자만 삭제 가능합니다.");
-      }
       const token = localStorage.getItem("token");
       await api.delete(`/posts/delete/${postId}`, {
         headers: { "x-auth-token": token },
@@ -86,7 +83,11 @@ const PostList = () => {
       alert("게시물이 삭제되었습니다.");
     } catch (error) {
       console.error("Failed to delete post:", error);
-      alert("게시물 삭제 실패.");
+      if (userId !== postId) {
+        alert("게시물 작성자만 삭제 가능합니다.");
+      } else {
+        alert("게시물 삭제 실패.");
+      }
     }
   };
   // 댓글 가져오기
@@ -183,14 +184,14 @@ const PostList = () => {
                     {/* 뒷면 */}
                     <div className="flip-card-back">
                       {/* 본인이 작성한 게시물에만 삭제 버튼 보이도록 설정 */}
-                      {post.author._id !== userId && (
-                        <button
-                          onClick={() => handleDelete(post._id)}
-                          className="absolute top-2 right-2 text-black px-2 py-1 rounded-full"
-                        >
-                          X
-                        </button>
-                      )}
+
+                      <button
+                        onClick={() => handleDelete(post._id)}
+                        className="absolute top-2 right-2 text-black px-2 py-1 rounded-full"
+                      >
+                        X
+                      </button>
+
                       <h3 className="text-xl font-bold text-gray-800 mb-2">
                         {post.title}
                       </h3>

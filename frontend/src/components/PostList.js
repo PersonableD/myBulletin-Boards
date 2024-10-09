@@ -10,6 +10,7 @@ const PostList = () => {
   const [selectedPostId, setSelectedPostId] = useState(null); // 선택된 게시물 ID
   const [comments, setComments] = useState([]); // 댓글 상태
   const [newComment, setNewComment] = useState(""); // 새로운 댓글 입력 상태
+  const userId = localStorage.getItem("userId"); // 로그인한 사용자 ID를 로컬스토리지에서 가져오기
   //fetch : 직접 가서 가져오다
   useEffect(() => {
     const fetchPosts = async () => {
@@ -70,6 +71,19 @@ const PostList = () => {
     setComments([]);
   };
 
+  //게시물 삭제
+  const handleDelete = async (postId) => {
+    try {
+      const token = localStorage.getItem("token");
+      await api.delete(`/posts/delete/${postId}`, {
+        headers: { "x-auth-token": token },
+      });
+      setPosts(posts.filter((post) => post._id !== postId));
+      alert("게시물이 삭제되었습니다.");
+    } catch (error) {
+      console.error("Failed to delete post:", error);
+    }
+  };
   // 댓글 가져오기
   const fetchComments = async (postId) => {
     try {
@@ -163,6 +177,15 @@ const PostList = () => {
                     </div>
                     {/* 뒷면 */}
                     <div className="flip-card-back">
+                      {/* 본인이 작성한 게시물에만 삭제 버튼 보이도록 설정 */}
+                      {post.author._id === userId && (
+                        <button
+                          onClick={() => handleDelete(post._id)}
+                          className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded-full"
+                        >
+                          X
+                        </button>
+                      )}
                       <h3 className="text-xl font-bold text-gray-800 mb-2">
                         {post.title}
                       </h3>
@@ -175,7 +198,7 @@ const PostList = () => {
                       </button>
                       <button
                         onClick={() => openModal(post)}
-                        className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg focus:outline-none hover:bg-blue-600"
+                        className="bg-white border-2 border-black text-black py-2 px-4 rounded transition duration-300 hover:bg-green-500 hover:text-white"
                       >
                         크게 보기
                       </button>

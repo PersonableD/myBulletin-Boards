@@ -176,7 +176,7 @@ const PostList = () => {
                           className="w-full h-full max-w-full rounded-lg"
                         />
                       )}
-                      <p className="flip-card-front-inner absolute text-xl  bottom-11  right-4 text-gray-600">
+                      <p className="flip-card-front-inner absolute text-xl  bottom-11  right-4 text-white">
                         {" "}
                         &lt;/💚 {post.likes}&gt;
                       </p>
